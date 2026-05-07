@@ -68,6 +68,10 @@ jobs:
           ZIP_NAME="finanda-export-v${VERSION}.zip"
           BUILD_DATE=$(date -u +"%d/%m/%Y")
           SHORT_SHA="${GITHUB_SHA::7}"
+          
+          # Create version.json for update checks
+          echo "{\"version\": \"${VERSION}\"}" > _site/version.json
+          
           sed -i "s|{{VERSION}}|${VERSION}|g" _site/index.html
           sed -i "s|{{ZIP_NAME}}|${ZIP_NAME}|g" _site/index.html
           sed -i "s|{{BUILD_DATE}}|${BUILD_DATE}|g" _site/index.html

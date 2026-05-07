@@ -47,7 +47,8 @@ function initBridge() {
       const resInput = document.getElementById("finanda-res-input");
       const resBtn = document.getElementById("finanda-res-btn");
       if (resInput && resBtn) {
-        resInput.value = JSON.stringify({ action: "FINANDA_PING", payload: { status: "PONG" } });
+        const manifest = chrome.runtime.getManifest();
+        resInput.value = JSON.stringify({ action: "FINANDA_PING", payload: { status: "PONG", version: manifest.version } });
         resBtn.click();
       }
       return;
