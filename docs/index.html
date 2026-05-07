@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finanda Export Bridge — Chrome Extension</title>
+  <meta name="description" content="Download the Finanda Export Bridge Chrome extension to seamlessly sync your Finanda financial data with Google Sheets.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.07);
+      --border-card: rgba(255,255,255,0.08);
+      --text-primary: #f0f2f5;
+      --text-secondary: #8b93a7;
+      --text-muted: #5a6278;
+      --accent-green: #34d399;
+      --accent-green-dim: rgba(52,211,153,0.15);
+      --accent-emerald: #10b981;
+      --accent-teal: #14b8a6;
+      --gradient-hero: linear-gradient(135deg, #065f46 0%, #0a0f1a 50%, #1e1b4b 100%);
+      --gradient-btn: linear-gradient(135deg, #10b981, #14b8a6);
+      --gradient-btn-hover: linear-gradient(135deg, #34d399, #2dd4bf);
+      --shadow-glow: 0 0 60px rgba(16,185,129,0.15);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ─── Animated Background ─── */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-glow::before, .bg-glow::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.3;
+      animation: float 20s ease-in-out infinite;
+    }
+    .bg-glow::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #065f46, transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .bg-glow::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #1e1b4b, transparent 70%);
+      bottom: -10%; right: -5%;
+      animation-delay: -10s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -40px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ─── Layout ─── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px) saturate(1.4);
+      background: rgba(10,15,26,0.75);
+      border-bottom: 1px solid var(--border-card);
+    }
+    .nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .nav-brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent-green); }
+
+    /* ─── Hero ─── */
+    .hero {
+      text-align: center;
+      padding: 100px 0 60px;
+    }
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      box-shadow: var(--shadow-glow);
+      margin-bottom: 32px;
+      animation: logoEntry 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes logoEntry {
+      from { opacity: 0; transform: translateY(24px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #f0f2f5 30%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeUp 0.6s 0.15s both;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      animation: fadeUp 0.6s 0.3s both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Download CTA ─── */
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      animation: fadeUp 0.6s 0.45s both;
+    }
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: var(--gradient-btn);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(16,185,129,0.3);
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      background: var(--gradient-btn-hover);
+      box-shadow: 0 8px 32px rgba(16,185,129,0.4);
+    }
+    .btn-download svg { width: 20px; height: 20px; }
+    .cta-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .cta-meta span {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ─── Info Cards ─── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 60px 0;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      transition: background 0.25s, border-color 0.25s, transform 0.25s;
+    }
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(52,211,153,0.2);
+      transform: translateY(-4px);
+    }
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--accent-green-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: var(--accent-green);
+    }
+    .card-icon svg { width: 22px; height: 22px; }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ─── Install Steps ─── */
+    .install-section {
+      margin: 20px 0 80px;
+    }
+    .install-section h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: background 0.25s;
+    }
+    .step:hover { background: var(--bg-card-hover); }
+    .step-num {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-green-dim);
+      color: var(--accent-green);
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-content h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .step-content p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .step-content code {
+      background: rgba(52,211,153,0.1);
+      color: var(--accent-green);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      border-top: 1px solid var(--border-card);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--accent-green); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .hero { padding: 60px 0 40px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <img src="logo.png" alt="Finanda Logo">
+      Finanda Export
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/elhay-av/Finanda-sheets-extension" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <img src="logo.png" alt="Finanda Export Bridge Logo" class="hero-logo">
+    <h1>Finanda Export Bridge</h1>
+    <p>Seamlessly sync your Finanda financial data with Google Sheets. Secure, fast, and fully automated.</p>
+
+    <div class="cta-group">
+      <a href="{{ZIP_NAME}}" class="btn-download" id="download-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        Download v{{VERSION}}
+      </a>
+      <p class="cta-meta">
+        Built on <span>{{BUILD_DATE}}</span> &middot; Commit <span>{{SHORT_SHA}}</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="cards">
+    <div class="card">
+      <div class="card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      </div>
+      <h3>Secure Auth</h3>
+      <p>Handles Finanda authentication &amp; MFA directly in the extension — your credentials never touch Apps Script.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+      </div>
+      <h3>Fast Sync</h3>
+      <p>Fetches and maps your financial data in seconds, pushing it directly into your spreadsheet.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.924 3.1 2.062 4.267.19.195.294.45.294.714v0a.946.946 0 01-.946.946 48.59 48.59 0 00-7.036.879M14.25 6.087c0 .662.257 1.302.723 1.745a17.891 17.891 0 004.636 3.275c.27.143.502.353.502.65v0c0 .48-.263.893-.648 1.108a39.587 39.587 0 00-4.083 2.71m0 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm0 0v0c0 .88-.717 1.589-1.58 1.616a48.114 48.114 0 01-7.67-.346"/></svg>
+      </div>
+      <h3>No CORS Issues</h3>
+      <p>Bypasses browser CORS restrictions by routing API calls through the extension's service worker.</p>
+    </div>
+  </section>
+
+  <!-- Install Guide -->
+  <section id="install" class="install-section">
+    <h2>Installation Guide</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Download the Extension</h3>
+          <p>Click the download button above to get the latest <code>.zip</code> file.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Unzip the Package</h3>
+          <p>Extract the downloaded ZIP to a folder on your computer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Open Extensions Page</h3>
+          <p>Navigate to <code>chrome://extensions</code> in your browser and enable <strong>Developer mode</strong> (top-right toggle).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Load Unpacked</h3>
+          <p>Click <strong>"Load unpacked"</strong> and select the extracted folder. The Finanda Export Bridge icon will appear in your toolbar.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Open Google Sheets</h3>
+          <p>Open your Finanda-connected Google Sheet and launch the sidebar — the extension will automatically detect and connect.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 Finanda Export Bridge &middot; <a href="https://github.com/elhay-av/Finanda-sheets-extension" target="_blank">View on GitHub</a></p>
+</footer>
+
+</body>
+</html>
