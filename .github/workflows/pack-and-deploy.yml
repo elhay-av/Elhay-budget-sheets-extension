@@ -50,21 +50,6 @@ jobs:
             icon128.png \
             -x "*.DS_Store"
 
-      - name: Pack extension into CRX
-        run: |
-          npm install -g crx3
-          # Prepare a clean directory with only extension files
-          mkdir -p _crx_src
-          cp manifest.json background.js content.js icon.png icon16.png icon48.png icon128.png _crx_src/
-          # Generate a signing key if not provided as secret
-          if [ -z "${{ secrets.CRX_PRIVATE_KEY }}" ]; then
-            openssl genrsa 2048 > _build/key.pem 2>/dev/null
-          else
-            echo "${{ secrets.CRX_PRIVATE_KEY }}" > _build/key.pem
-          fi
-          crx3 _crx_src \
-            -o _build/finanda-export-v${{ steps.version.outputs.version }}.crx \
-            -p _build/key.pem
 
       - name: Upload extension ZIP as artifact
         uses: actions/upload-artifact@v4
@@ -73,26 +58,17 @@ jobs:
           path: _build/finanda-export-v${{ steps.version.outputs.version }}.zip
           retention-days: 90
 
-      - name: Upload extension CRX as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: finanda-export-v${{ steps.version.outputs.version }}-crx
-          path: _build/finanda-export-v${{ steps.version.outputs.version }}.crx
-          retention-days: 90
 
       - name: Prepare GitHub Pages site
         run: |
           mkdir -p _site
           cp -r docs/* _site/
-          cp _build/finanda-export-v${{ steps.version.outputs.version }}.crx _site/
           cp _build/finanda-export-v${{ steps.version.outputs.version }}.zip _site/
           VERSION="${{ steps.version.outputs.version }}"
-          CRX_NAME="finanda-export-v${VERSION}.crx"
           ZIP_NAME="finanda-export-v${VERSION}.zip"
           BUILD_DATE=$(date -u +"%d/%m/%Y")
           SHORT_SHA="${GITHUB_SHA::7}"
           sed -i "s|{{VERSION}}|${VERSION}|g" _site/index.html
-          sed -i "s|{{CRX_NAME}}|${CRX_NAME}|g" _site/index.html
           sed -i "s|{{ZIP_NAME}}|${ZIP_NAME}|g" _site/index.html
           sed -i "s|{{BUILD_DATE}}|${BUILD_DATE}|g" _site/index.html
           sed -i "s|{{SHORT_SHA}}|${SHORT_SHA}|g" _site/index.html

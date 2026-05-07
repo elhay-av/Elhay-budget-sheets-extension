@@ -29,13 +29,9 @@
     <h1>Finanda Export Bridge</h1>
     <p>סנכרון חכם של הנתונים הפיננסיים שלכם מ-Finanda ישירות ל-Google Sheets. מאובטח, מהיר, ואוטומטי לחלוטין.</p>
     <div class="cta-group">
-      <a href="{{CRX_NAME}}" class="btn-download" id="download-crx-btn">
+      <a href="{{ZIP_NAME}}" class="btn-download" id="download-zip-btn">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-        הורדת התוסף v{{VERSION}}
-      </a>
-      <a href="{{ZIP_NAME}}" class="btn-secondary" id="download-zip-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
-        הורדה כ-ZIP (התקנה ידנית)
+        הורדת התוסף (ZIP)
       </a>
       <p class="cta-meta">נבנה בתאריך <span>{{BUILD_DATE}}</span> · קומיט <span>{{SHORT_SHA}}</span></p>
     </div>
@@ -67,58 +63,28 @@
 
   <section id="install" class="install-section">
     <h2>מדריך התקנה</h2>
-    <div class="install-tabs">
-      <button class="tab-btn active" data-tab="crx">התקנה מהירה (CRX)</button>
-      <button class="tab-btn" data-tab="zip">התקנה ידנית (ZIP)</button>
-    </div>
-
-    <div class="tab-content active" id="tab-crx">
-      <div class="steps">
-        <div class="step"><div class="step-num">1</div><div class="step-content">
-          <h3>הורידו את קובץ ה-CRX</h3>
-          <p>לחצו על כפתור ההורדה למעלה להורדת קובץ <code>.crx</code> העדכני.</p>
-        </div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-content">
-          <h3>פתחו את דף ההרחבות</h3>
-          <p>הקלידו בשורת הכתובת <code>chrome://extensions</code> ולחצו Enter.</p>
-        </div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-content">
-          <h3>גררו את הקובץ</h3>
-          <p>גררו את קובץ ה-<code>.crx</code> שהורדתם ישירות לתוך דף ההרחבות. יופיע חלון אישור — לחצו <strong>"הוסף תוסף"</strong>.</p>
-        </div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-content">
-          <h3>פתחו את Google Sheets</h3>
-          <p>פתחו את גיליון ה-Google Sheets המחובר ל-Finanda והפעילו את הסרגל הצדדי — התוסף יתחבר אוטומטית.</p>
-        </div></div>
-      </div>
-      <div class="note-box">
-        <strong>💡 שימו לב:</strong> בגרסאות מסוימות של Chrome, ייתכן שתידרשו להפעיל "מצב מפתחים" בדף ההרחבות. ב-Microsoft Edge ניתן לגרור ולהתקין ללא הגבלה.
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-zip">
-      <div class="steps">
-        <div class="step"><div class="step-num">1</div><div class="step-content">
-          <h3>הורידו את קובץ ה-ZIP</h3>
-          <p>לחצו על כפתור ההורדה <strong>"הורדה כ-ZIP"</strong> למעלה.</p>
-        </div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-content">
-          <h3>חלצו את הקובץ</h3>
-          <p>חלצו את תוכן קובץ ה-ZIP לתיקייה במחשב שלכם.</p>
-        </div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-content">
-          <h3>פתחו את דף ההרחבות</h3>
-          <p>הקלידו <code>chrome://extensions</code> בשורת הכתובת והפעילו את <strong>"מצב מפתחים"</strong> (מתג בפינה הימנית העליונה).</p>
-        </div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-content">
-          <h3>טענו את התוסף</h3>
-          <p>לחצו <strong>"טען ללא אריזה"</strong> ובחרו את התיקייה שחילצתם. הסמל של Finanda Export יופיע בסרגל הכלים.</p>
-        </div></div>
-        <div class="step"><div class="step-num">5</div><div class="step-content">
-          <h3>פתחו את Google Sheets</h3>
-          <p>פתחו את הגיליון המחובר ל-Finanda והפעילו את הסרגל הצדדי — התוסף יתחבר אוטומטית.</p>
-        </div></div>
-      </div>
+    
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content">
+        <h3>הורידו את קובץ ה-ZIP</h3>
+        <p>לחצו על כפתור ההורדה למעלה.</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content">
+        <h3>חלצו את הקובץ</h3>
+        <p>חלצו את תוכן קובץ ה-ZIP לתיקייה במחשב שלכם.</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content">
+        <h3>פתחו את דף ההרחבות</h3>
+        <p>הקלידו <code>chrome://extensions</code> בשורת הכתובת והפעילו את <strong>"מצב מפתחים"</strong> (מתג בפינה הימנית העליונה).</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content">
+        <h3>טענו את התוסף</h3>
+        <p>לחצו <strong>"טען ללא אריזה"</strong> ובחרו את התיקייה שחילצתם. הסמל של Finanda Export יופיע בסרגל הכלים.</p>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content">
+        <h3>פתחו את Google Sheets</h3>
+        <p>פתחו את הגיליון המחובר ל-Finanda והפעילו את הסרגל הצדדי — התוסף יתחבר אוטומטית.</p>
+      </div></div>
     </div>
   </section>
 </main>
@@ -126,16 +92,5 @@
 <footer>
   <p>&copy; 2026 Finanda Export Bridge · <a href="https://github.com/elhay-av/Finanda-sheets-extension" target="_blank">צפו ב-GitHub</a></p>
 </footer>
-
-<script>
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-  });
-});
-</script>
 </body>
 </html>
