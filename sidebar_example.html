@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; width: 100%; }
+    button:hover { background-color: #45a049; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 4px; }
+    .success { background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+    .error { background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+    .info { background-color: #d9edf7; color: #31708f; border: 1px solid #bce8f1; }
+    
+    #mfaSection { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc; }
+    #dataOutput { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; font-family: monospace; display: none; overflow-x: auto;}
+  </style>
+</head>
+<body>
+
+  <h2>Finanda Export</h2>
+  
+  <div id="loginSection">
+    <div class="form-group">
+      <label for="username">Email/Username:</label>
+      <input type="text" id="username" placeholder="elhayav@gmail.com">
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password">
+    </div>
+    <button id="loginBtn">Fetch Data from Finanda</button>
+  </div>
+
+  <div id="mfaSection">
+    <div class="form-group">
+      <label for="mfaCode">Enter SMS Code:</label>
+      <input type="text" id="mfaCode">
+    </div>
+    <button id="verifyMfaBtn">Verify & Fetch</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="dataOutput"></div>
+
+  <script>
+    // State to hold session if MFA is required
+    let currentSession = null;
+    let currentUsername = null;
+    let currentPassword = null;
+
+    const statusDiv = document.getElementById('status');
+    const dataOutputDiv = document.getElementById('dataOutput');
+    const loginSection = document.getElementById('loginSection');
+    const mfaSection = document.getElementById('mfaSection');
+
+    function setStatus(msg, type) {
+      statusDiv.textContent = msg;
+      statusDiv.className = type;
+      statusDiv.style.display = 'block';
+    }
+
+    function showData(data) {
+      dataOutputDiv.textContent = JSON.stringify(data, null, 2);
+      dataOutputDiv.style.display = 'block';
+    }
+
+    // Helper to send messages to the Chrome Extension content script
+    function sendToExtension(action, payload) {
+      return new Promise((resolve) => {
+        const handler = (event) => {
+          if (event.source === window && event.data && event.data.source === "FINANDA_EXTENSION" && event.data.responseTo === action) {
+            window.removeEventListener('message', handler);
+            resolve(event.data.payload);
+          }
+        };
+        window.addEventListener('message', handler);
+
+        window.postMessage({
+          target: "FINANDA_EXTENSION",
+          payload: { action: action, ...payload }
+        }, "*");
+      });
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        setStatus("Please enter username and password", "error");
+        return;
+      }
+
+      currentUsername = username;
+      currentPassword = password;
+
+      setStatus("Logging in to Finanda...", "info");
+      document.getElementById('loginBtn').disabled = true;
+
+      try {
+        const response = await sendToExtension('FINANDA_LOGIN', { username, password });
+        
+        document.getElementById('loginBtn').disabled = false;
+
+        if (response.status === 'SUCCESS') {
+          setStatus("Login & Fetch Successful!", "success");
+          showData(response.data);
+          // Here you would typically send response.data back to your Apps Script backend
+          // google.script.run.processFinandaData(response.data);
+        } else if (response.status === 'MFA_REQUIRED') {
+          currentSession = response.session;
+          setStatus("MFA Code sent to your phone. Please enter it below.", "info");
+          loginSection.style.display = 'none';
+          mfaSection.style.display = 'block';
+        } else {
+          setStatus("Login Failed: " + (response.message || "Unknown error"), "error");
+        }
+      } catch (err) {
+        document.getElementById('loginBtn').disabled = false;
+        setStatus("Communication error with extension", "error");
+        console.error(err);
+      }
+    });
+
+    document.getElementById('verifyMfaBtn').addEventListener('click', async () => {
+      const mfaCode = document.getElementById('mfaCode').value;
+
+      if (!mfaCode) {
+        setStatus("Please enter the MFA code", "error");
+        return;
+      }
+
+      setStatus("Verifying MFA...", "info");
+      document.getElementById('verifyMfaBtn').disabled = true;
+
+      try {
+        const response = await sendToExtension('FINANDA_MFA_VERIFY', { 
+            session: currentSession, 
+            mfaCode: mfaCode,
+            username: currentUsername,
+            password: currentPassword
+        });
+        
+        document.getElementById('verifyMfaBtn').disabled = false;
+
+        if (response.status === 'SUCCESS') {
+          setStatus("MFA Verification & Fetch Successful!", "success");
+          mfaSection.style.display = 'none';
+          loginSection.style.display = 'block'; // Reset UI
+          showData(response.data);
+           // google.script.run.processFinandaData(response.data);
+        } else {
+          setStatus("MFA Verification Failed: " + (response.message || "Unknown error"), "error");
+        }
+      } catch (err) {
+        document.getElementById('verifyMfaBtn').disabled = false;
+        setStatus("Communication error with extension", "error");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
