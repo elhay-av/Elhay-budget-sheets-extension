@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Finanda Export Bridge",
+  "name": "Elhay budget",
   "version": "1.0",
-  "description": "Bridges Google Apps Script sidebar with Finanda API to export data.",
+  "description": "Manage your Finanda budget directly from Google Sheets.",
   "permissions": [
     "storage"
   ],

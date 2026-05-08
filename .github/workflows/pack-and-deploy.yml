@@ -58,6 +58,15 @@ jobs:
           path: _build/finanda-export-v${{ steps.version.outputs.version }}.zip
           retention-days: 90
 
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: _build/finanda-export-v${{ steps.version.outputs.version }}.zip
+          extension-id: ${{ secrets.EXTENSION_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          refresh-token: ${{ secrets.REFRESH_TOKEN }}
+          publish: true
 
       - name: Prepare GitHub Pages site
         run: |

@@ -229,15 +229,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
      return true;
   }
 
-  if (request.action === 'FINANDA_CHECK_UPDATE') {
-     const timestamp = new Date().getTime();
-     fetch(`https://elhay-av.github.io/Finanda-sheets-extension/version.json?t=${timestamp}`)
-       .then(res => res.json())
-       .then(data => sendResponse({ status: 'SUCCESS', version: data.version }))
-       .catch(err => sendResponse({ status: 'ERROR', message: err.toString() }));
-     return true;
-  }
-
    if (request.action === 'FINANDA_FETCH_DATA') {
       // Just in case they want to fetch data later using a cached session
       chrome.storage.local.get(['finandaSession'], (result) => {
