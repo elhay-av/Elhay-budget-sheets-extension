@@ -1,4 +1,12 @@
-const DEVICE_ID = '1253';
+async function getDeviceId() {
+  const result = await chrome.storage.local.get(['deviceId']);
+  if (result.deviceId) {
+    return result.deviceId;
+  }
+  const newId = self.crypto.randomUUID();
+  await chrome.storage.local.set({ deviceId: newId });
+  return newId;
+}
 const globalHeaders = {
   // We cannot easily spoof some of these headers in a browser environment due to browser security restrictions.
   // We will let the browser handle standard headers (User-Agent, Origin, etc.) for fetch.
@@ -15,9 +23,10 @@ function getURLSearchParams(params) {
 }
 
 async function loginToFinanda(username, password) {
+  const deviceId = await getDeviceId();
   const body = getURLSearchParams({
     password: password,
-    device: `Chrome-${DEVICE_ID}`,
+    device: `Chrome-${deviceId}`,
     version: '1.63',
     appVersion: '1.73',
     checkSubscription: 'true',
@@ -103,9 +112,10 @@ async function loginToFinanda(username, password) {
 
 async function verifyMfa(session, mfaCode, username, password) {
   try {
+     const deviceId = await getDeviceId();
      const mfaAuthBody = getURLSearchParams({
         encSession: session,
-        device: `Chrome-${DEVICE_ID}`,
+        device: `Chrome-${deviceId}`,
         mfaCode: mfaCode,
         validationType: 'user'
       });
@@ -125,7 +135,7 @@ async function verifyMfa(session, mfaCode, username, password) {
         // Now re-login with username/password as per original flow
         const body = getURLSearchParams({
           password: password,
-          device: `Chrome-${DEVICE_ID}`,
+          device: `Chrome-${deviceId}`,
           version: '1.63',
           appVersion: '1.73',
           checkSubscription: 'true',
