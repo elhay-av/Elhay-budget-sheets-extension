@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Get version from manifest
         id: version
@@ -61,7 +61,6 @@ jobs:
             icon128.png \
             -x "*.DS_Store"
 
-
       - name: Upload extension ZIP as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -78,7 +77,7 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
-          publish: false
+          publish: true
 
       - name: Prepare GitHub Pages site
         run: |

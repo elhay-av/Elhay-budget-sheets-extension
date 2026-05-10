@@ -1,19 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Elhay budget",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Manage your Finanda budget directly from Google Sheets.",
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "host_permissions": [
-    "https://cloud.finanda.co.il/*"
-  ],
+  "host_permissions": ["https://cloud.finanda.co.il/*"],
   "background": {
     "service_worker": "background.js"
   },
@@ -25,9 +21,7 @@
         "file:///*"
       ],
       "all_frames": true,
-      "js": [
-        "content.js"
-      ],
+      "js": ["content.js"],
       "run_at": "document_idle",
       "match_about_blank": true,
       "match_origin_as_fallback": true
